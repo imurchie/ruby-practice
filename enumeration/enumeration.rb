@@ -5,6 +5,9 @@
 # fixed original implementation in which Arrays were returned from Enumerable, rather than instances of SortedList (which seems wrong behaviour).
 
 
+require "fiber"
+
+
 module MyEnumerable
   def map
     if block_given?
