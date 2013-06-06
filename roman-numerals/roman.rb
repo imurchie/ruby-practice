@@ -2,9 +2,11 @@
 
 
 class Numeral
-  def initialize(num)
+  def initialize(num, lowercase = false)
     @num = num
     @num.freeze
+    
+    @lowercase = lowercase
   end
   
   def integer
@@ -31,7 +33,7 @@ class Numeral
       end
     end
     
-    numeral
+    @lowercase ? numeral.downcase : numeral
   end
 
   # 9 = IX
@@ -82,6 +84,6 @@ class Numeral
     
     (num % 10000).step(1, -1000) { numeral = "M" + numeral; num -= 1000 }
     
-    numeral
+    @lowercase ? numeral.downcase : numeral
   end
 end
