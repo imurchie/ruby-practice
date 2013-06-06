@@ -204,6 +204,10 @@ class SortedList
     @list[-1]
   end
   
+  def delete(element)
+    @list.delete(element)
+  end
+  
   protected
   def list
     # send out the list unprotected. Trust the calling class
