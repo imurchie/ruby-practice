@@ -45,4 +45,19 @@ describe MyEnumerable do
     it "supports Enumerable#max" do
       @list.max.should == 42
     end
+    
+    it "supports Enumerable#to_a" do
+      @list.to_a.should == [3, 4, 7, 13, 42]
+    end
+    
+    it "supports Enumerable#take" do
+      @list.take(0).should == []
+      @list.take(3).should == [3, 4, 7]
+      @list.take(6).should == [3, 4, 7, 13, 42]
+      lambda { @list.take(-1) }.should raise_error(ArgumentError)
+    end
+    
+    it "supports Enumerabel#take_while" do
+      @list.take_while { |e| e < 10 }.should == [3, 4, 7]
+    end
 end

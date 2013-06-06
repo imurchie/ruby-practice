@@ -1,4 +1,8 @@
+# initially an implementation of the problem in Practicing Ruby 2.4 (https://practicingruby.com/articles/4)
+# added implementation of more Enumerable methods
+# implemented with RSpec
 
+# fixed original implementation in which Arrays were returned from Enumerable, rather than instances of SortedList (which seems wrong behaviour).
 
 
 module MyEnumerable
@@ -9,6 +13,7 @@ module MyEnumerable
       SortedList.new(mapped_list)
     else
       # generate an Enumerator
+      MyEnumerator.new(self, :map)
     end
   end
   
@@ -72,7 +77,89 @@ module MyEnumerable
     max
   end
   
+  def to_a
+    array = []
+    each { |e| array << e }
+    
+    array
+  end
+  
+  def take(n)
+    raise ArgumentError if n < 0
+    
+    array = []
+    i = 0
+    each do |e|
+      break if i == n
+      
+      array << e
+      i += 1
+    end
+    
+    array
+  end
+  
+  def take_while
+    if block_given?
+      array = []
+      each do |e|
+        break unless yield(e)
+        
+        array << e
+      end
+      
+      return array
+    else
+      # return an Enumerator
+    end
+  end
+  
   alias :inject :reduce
+end
+
+class MyEnumerator
+  include MyEnumerable
+  
+  def initialize(target, iter)
+    @target = target
+    @iter = iter
+    
+    @current = 0
+  end
+  
+  def each(&block)
+    @target.send(@iter, &block)
+  end
+  
+  def next
+    # there is magic that can be done using Fiber
+    @fiber ||= Fiber.new do
+      each { |e| Fiber.yield(e) }
+      
+      raise StopIteration
+    end
+    
+    if @fiber.alive?
+      @fiber.resume
+    else
+      raise StopIteration
+    end
+  end
+  
+  def with_index
+    i = 0
+    out = []
+    each do |element|
+      out << yield(element, i)
+      i += 1
+    end
+    
+    out
+  end
+  
+  def rewind
+    @fiber = nil
+  end
 end
 
 
@@ -96,6 +183,7 @@ class SortedList
       @list.each { |e| yield(e) }
     else
       # this should return an enumerator
+      MyEnumerator.new(self, :each)
     end
   end
   
