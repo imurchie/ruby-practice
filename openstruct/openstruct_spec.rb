@@ -4,13 +4,30 @@ require_relative "openstruct"
 
 
 describe Practice::MyOpenStruct do
-  xit "supports OpenStruct#new" do
+  it "supports OpenStruct#new(Hash)" do
+    attributes = {test: "this is a test"}
+    s = Practice::MyOpenStruct.new(attributes)
+    
+    s.test.should == "this is a test"
   end
   
-  xit "supports OpenStruct#new(Hash)" do
-  end
-  
-  xit "supports OpenStruct#==(other)" do
+  describe "supports OpenStruct#==(other)" do
+    before do
+      attributes = {test: "this is a test"}
+      @s1 = Practice::MyOpenStruct.new(attributes)
+      @s2 = Practice::MyOpenStruct.new(attributes)
+      
+      attributes[:test2] = "this is another test"
+      @s3 = Practice::MyOpenStruct.new(attributes)
+    end
+    
+    it "with identical structures" do
+      @s1.should == @s2
+    end
+    
+    it "with different structures" do
+      @s1.should_not == @s3
+    end
   end
   
   describe "setting attributes" do
@@ -24,13 +41,17 @@ describe Practice::MyOpenStruct do
       @s.string.should == "This is a string"
     end
     
-    xit "of Array types" do
+    it "of Array types" do
+      @s.array = [1, 3, 24, 5]
+      
+      @s.array.should == [1, 3, 24, 5]
     end
   
-    xit "of Fixnum types" do
-    end
-  
-    xit "of ad hoc types" do
+    it "of ad hoc types" do
+      test_class = Class.new {}
+      @s.klass = test_class
+      
+      @s.klass.should == test_class
     end
   end
   
@@ -59,8 +80,5 @@ describe Practice::MyOpenStruct do
       s.test.should == nil
       lambda { s.delete_field("test") }.should raise_error(NameError)
     end
-  end 
-  
-  xit "supports OpenStruct#initialize_copy(orig)" do
   end
 end
