@@ -1,7 +1,7 @@
 module Practice
   class MyOpenStruct
     def initialize(hash = {})
-      @attributes = hash
+      @attributes = hash.clone
     end
     
     def ==(other)
