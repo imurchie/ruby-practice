@@ -3,16 +3,16 @@ require "rspec"
 require_relative "enumeration"
 
 
-describe MyEnumerable do
+describe Practice::MyEnumerable do
   before do
-    @list = SortedList.new
+    @list = Practice::SortedList.new
     
     # will get stored internally as 3, 4, 7, 13, 42
     @list << 3 << 13 << 42 << 4 << 7
   end
   
   it "supports Enumerable#map" do
-    @list.map{ |x| x+1}.should == SortedList.new([4,5,8,14,43])
+    @list.map{ |x| x+1}.should == Practice::SortedList.new([4,5,8,14,43])
   end
   
   it "supports Enumerable#sort_by" do
@@ -21,7 +21,7 @@ describe MyEnumerable do
   end
   
   it "supports Enumerable#select" do
-    @list.select{ |x| x.even?}.should == SortedList.new([4,42])
+    @list.select{ |x| x.even?}.should == Practice::SortedList.new([4,42])
   end
   
   it "supports Enumerable#reduce" do
@@ -62,9 +62,9 @@ describe MyEnumerable do
   end
 end
 
-describe MyEnumerator do
+describe Practice::MyEnumerator do
   before do
-    @list = SortedList.new
+    @list = Practice::SortedList.new
     
     @list << 3 << 13 << 42 << 4 << 7
   end
