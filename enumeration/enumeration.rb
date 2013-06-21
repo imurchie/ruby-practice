@@ -21,13 +21,13 @@ module Practice
       end
     end
     
-    def sort_by
+    def sort_by(&block)
       # make an array of arrays, such that in the sub array the first element is the yielded one, the other the original
-      list = map { |e| [yield(e), e] }
+      list = map { |e| [block.call(e), e] }
     
       # sort the list, and map back to just the second element of each sub array
       # need to return a regular list, otherwise it will be re-sorted
-      list.list.sort.map { |e| e[1] }
+      arr = list.list.sort.map { |e| e[1] }
     end
     
     def select
@@ -170,13 +170,15 @@ module Practice
   class SortedList
     include MyEnumerable
   
-    def initialize(list=[])
+    def initialize(list=[], &block)
       @list = list.sort
+      
+      @algorithm = block ? block : lambda { |a, b| a <=> b }
     end
   
     def <<(element)
       @list << element
-      @list.sort!
+      @list.sort!(&@algorithm)
     
       # so we can chain
       self
