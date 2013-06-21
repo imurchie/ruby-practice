@@ -1,0 +1,1 @@
+Implements a simple domain specific language for events and their setup. Partially based on the same such in "Metaprogramming Ruby", but object orientedly (since there it seems designed to make a mockery of OOP principles.)
