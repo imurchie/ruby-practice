@@ -1,0 +1,1 @@
+A very simple Markov Chain generator, and program to tweet generated strings.
