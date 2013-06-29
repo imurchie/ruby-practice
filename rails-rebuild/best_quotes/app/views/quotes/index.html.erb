@@ -1,0 +1,3 @@
+<% quotes.each do |q| %>
+<p> <%= q["quote"] %><br/>submitted by <a href="/quotes/quotes_by_submitter?submitter=<%= q["submitter"] %>"><%= q["submitter"] %></a> </p>
+<% end %>
