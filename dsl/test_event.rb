@@ -1,3 +1,5 @@
+require_relative "eventmanager"
+
 describe do
   event "the sky is falling" do
     @sky_height < 300

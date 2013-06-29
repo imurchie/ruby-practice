@@ -1,9 +1,8 @@
 module Practice
   class EventManager
     def initialize(block)
-      @setups = []
-      @events = {}
-      @other_elements = {}
+      @setups         = []
+      @events         = {}
       
       instance_eval(&block)
     end
@@ -16,13 +15,12 @@ module Practice
           event.instance_eval(&setup_block)
         end
         
-        p @other_elements unless @other_elements.empty?
-        
         p event
         
         puts "ALERT: #{name}" if event.instance_eval(&event_block)
       end
     end
+    
     
     private
     def setup(&block)
@@ -51,7 +49,7 @@ def describe(str = nil, &block)
 end
 
 
-Dir.glob("*event.rb").each do |file|
+Dir.glob("*event.rb").uniq.each do |file|
   load file
 end
 
