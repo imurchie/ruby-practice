@@ -1,18 +1,19 @@
 require "rulers"
 
 class QuotesController < Rulers::Controller
-  def a_quote
-    @noun = "blinking"
-    render(:a_quote)
+  def show
+    quote = FileModel.find(params["id"])
+    ua = request.user_agent
+    render_response(:quote, :obj => quote, :ua => ua)
   end
   
-  def quote_1
-    quote_1 = FileModel.find(1)
-    render(:quote, :obj => quote_1)
+  def a_quote
+    @noun = "blinking"
+    render_response(:a_quote)
   end
   
   def index
-    render(:index, :quotes => FileModel.all)
+    render_response(:index, :quotes => FileModel.all)
   end
   
   def new_quote
@@ -23,7 +24,7 @@ class QuotesController < Rulers::Controller
     }
     
     m = FileModel.create(attrs)
-    render(:quote, :obj => m)
+    render_response(:quote, :obj => m)
   end
   
   def update_quote
@@ -34,11 +35,11 @@ class QuotesController < Rulers::Controller
     
     quote_1.save
     
-    render(:quote, :obj => quote_1)
+    render_response(:quote, :obj => quote_1)
   end
   
   def quotes_by_submitter
-    render(:by_submitter, :quotes => FileModel.find_all_by_submitter("web user"))
+    render_response(:by_submitter, :quotes => FileModel.find_all_by_submitter("web user"))
   end
   
     # for checking what the app does with an uncaught exception
