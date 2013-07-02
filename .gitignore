@@ -1,3 +1,4 @@
 markov/settings.yml
 .DS_Store
 *.gem
+*.lock
