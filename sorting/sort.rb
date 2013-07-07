@@ -93,6 +93,65 @@ def shell_sort(a)
   end
 end
 
-a = [5, 9, 3, 8, 5, 7, 4, 23, 42, 22, 59, 76, 54, 55, 31, 33]
-puts "array: #{a.inspect}"
-shell_sort(a)
+
+# O(nlogn)
+def merge_sort(a)
+  array = a
+  
+  # base case: an empty array, or one with 1 element, is sorted already
+  return a if a.length <= 1
+  
+  first = merge_sort(a[0..a.length/2-1])
+  second = merge_sort(a[a.length/2..a.length-1])
+  
+  # merge
+  res = []
+  i = j = 0
+  while i < first.length || j < second.length
+    if i == first.length
+      res << second[j]
+      j += 1
+    elsif j == second.length
+      res << first[i]
+      i += 1
+    elsif first[i] < second[j]
+      res << first[i]
+      i += 1
+    else
+      res << second[j]
+      j += 1
+    end
+  end
+  
+  res
+end
+
+
+# O(nlogn) - but requires much (i.e. O(n)) extra space (and is therefore no better than merge sort).
+def quick_sort(a)
+  array = a
+  
+  # already sorted!
+  return array if array.length <= 1
+  
+  pivot = array.length / 2
+  
+  lower = []
+  higher = []
+  array.length.times do |i|
+    next if i == pivot
+    
+    if array[i] >= array[pivot]
+      higher << array[i]
+    else
+      lower << array[i]
+    end
+  end
+  
+  return quick_sort(lower) + [array[pivot]] + quick_sort(higher)
+end
+
+#a = [5, 9, 3, 8, 5, 7, 4, 23, 42, 22, 59, 76, 54, 55, 31, 33]
+#a = [5,4,1,8,7,2,6,3,9]
+#puts "array: #{a.inspect}"
+#p quick_sort(a)
