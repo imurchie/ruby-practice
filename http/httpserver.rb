@@ -4,34 +4,92 @@ require "uri"
 
 module Practice
   class HttpServer
-    WEB_ROOT      = "./public"
-    DEFAULT_FILE  = "index.html"
+    DEFAULT_WEB_ROOT      = "./public"
+    DEFAULT_FILE          = "index.html"
+    DEFAULT_CONTENT_TYPE  = "application/octet-string"
 
-    CONTENT_TYPE_MAPPING = {
+    CONTENT_TYPE_MAPPING  = {
       "html"  =>  "text/html",
       "txt"   =>  "text/plain",
       "png"   =>  "image/png",
       "jpg"   =>  "image/jpg"
     }
 
-    DEFAULT_CONTENT_TYPE = "application/octet-string"
+    
     
     
     def initialize(host = "localhost", port = 2345)
       @server = TCPServer.new(host, port)
     end
 
-    private
-    def content_type(path)
-      ext = File.extname(path).split(".").last
-      CONTENT_TYPE_MAPPING.fetch(ext, DEFAULT_CONTENT_TYPE)
+    public
+    def start
+      loop do
+        socket  = @server.accept
+        request = HttpRequest.new(socket.gets)
+  
+        STDERR.puts "Request: #{request}"
+        
+        response = HttpResponse.new(request)
+  
+        #path = requested_file(request)
+        STDERR.puts "    File: #{response.path}"
+        
+        socket.print(response)
+  
+        socket.close
+      end
     end
-
+  end
+  
+  class HttpResponse
+    attr_reader :request_method, :path, :response_string
+    
+    def initialize(request)
+      @request_method   = request.method
+      
+      @path             = requested_file(request.uri)
+      
+      @response_string  = populate_response
+    end
+    
+    def to_s
+      response_string
+    end
+    
+    private
+    def populate_response
+      res = ""
+      
+      if File.exist?(path) && !File.directory?(path)
+        File.open(path, "rb") do |file|
+          res << "HTTP/1.1 200 OK\r\n"
+          res << "Content-Type: #{content_type(file)}\r\n" +
+          res << "Content-Length: #{file.size}\r\n" +
+          res << "Connection: close\r\n" +
+          res << "\r\n"
+          
+          res << file.read if request_method == :GET
+          
+          res << "\r\n"
+        end
+      else
+        res << "HTTP/1.1 404 Not Found\r\n" +
+        res << "Content-Type: text/plain\r\n" +
+        res << "Content-Length: #{message.size}\r\n" +
+        res << "Connection: close\r\n" +
+        res << "\r\n"
+        
+        res << "File not found" if request_method == :GET
+      end
+      
+      res
+    end
+    
     # implementation stolen from Rack::File
     private
-    def requested_file(request_line)
-      request_uri = request_line.split(" ")[1]
-      path        = URI.unescape(URI(request_uri).path)
+    def requested_file(uri)
+      path = URI.unescape(URI(uri).path)
   
       clean = []
   
@@ -43,59 +101,36 @@ module Practice
         part == ".." ? clean.pop : clean << part
       end
   
-      path = File.join(WEB_ROOT, *clean)
+      path = File.join(HttpServer::DEFAULT_WEB_ROOT, *clean)
   
       # use default if it is a directory
-      path = File.join(path, DEFAULT_FILE) if File.directory?(path)
+      path = File.join(path, HttpServer::DEFAULT_FILE) if File.directory?(path)
       
       path
     end
-
-
-    public
-    def start
-      loop do
-        socket        = @server.accept
-        request_line  = socket.gets
-  
-        STDERR.puts "Request: #{request_line}"
-  
-        path = requested_file(request_line)
-        STDERR.puts "    File: #{path}"
-  
-        if File.exist?(path) && !File.directory?(path)
-          serve_page(socket, path)
-        else
-          serve_error(socket)
-        end
-  
-        socket.close
-      end
-    end
     
     private
-    def serve_page(socket, path)
-      File.open(path, "rb") do |file|
-        socket.print  "HTTP/1.1 200 OK\r\n" +
-                      "Content-Type: #{content_type(file)}\r\n" +
-                      "Content-Length: #{file.size}\r\n" +
-                      "Connection: close\r\n" +
-                      "\r\n"
-        IO.copy_stream(file, socket)
-        socket.print  "\r\n"
-      end
+    def content_type(path)
+      ext = File.extname(path).split(".").last
+      HttpServer::CONTENT_TYPE_MAPPING.fetch(ext, HttpServer::DEFAULT_CONTENT_TYPE)
+    end
+  end
+  
+  class HttpRequest
+    attr_reader :method, :uri, :protocol
+    
+    def initialize(request_line)
+      # GET /etc/passwd HTTP/1.1
+      parts = request_line.split(" ")
+      
+      @method   = parts[0].to_sym
+      @uri      = parts[1]
+      @protocol = parts[2]
     end
     
-    private
-    def serve_error(socket)
-      message = "File not found\n"
-
-      socket.print  "HTTP/1.1 404 Not Found\r\n" +
-                    "Content-Type: text/plain\r\n" +
-                    "Content-Length: #{message.size}\r\n" +
-                    "Connection: close\r\n" +
-                    "\r\n" +
-                    "#{message}"
+    def to_s
+      #"<type: #{type}; uri: #{uri}; protocol: #{protocol}>"
+      "#{protocol} #{method} request: #{uri}"
     end
   end
 end
