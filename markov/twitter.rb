@@ -69,6 +69,6 @@ end
 
 m = get_markov(2)
 #m = Practice::MarkovChain.new(get_text, 2)
-p m
-#Twitter.update(m.text)
+#p m
+Twitter.update(m.text)
 
