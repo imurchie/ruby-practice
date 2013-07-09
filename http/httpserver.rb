@@ -1,7 +1,8 @@
 require "socket"
 require "uri"
 
-WEB_ROOT = "./public"
+WEB_ROOT      = "./public"
+DEFAULT_FILE  = "index.html"
 
 CONTENT_TYPE_MAPPING = {
   "html"  =>  "text/html",
@@ -32,7 +33,10 @@ def requested_file(request_line)
     part == ".." ? clean.pop : clean << part
   end
   
-  File.join(WEB_ROOT, *clean)
+  path = File.join(WEB_ROOT, *clean)
+  
+  # use default if it is a directory
+  File.join(path, DEFAULT_FILE) if File.directory?(path)
 end
 
 server = TCPServer.new("localhost", 2345)
