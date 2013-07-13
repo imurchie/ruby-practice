@@ -8,12 +8,16 @@ class QuotesController < Rulers::Controller
   end
   
   def a_quote
-    @noun = "blinking"
-    render_response(:a_quote)
+    render(:aquote, :noun => :winking)
+  end
+  
+  def quote_1
+    quote_1 = FileModel.find(1)
+    render(:quote, :obj => quote_1)
   end
   
   def index
-    render_response(:index, :quotes => FileModel.all)
+    render(:index, :quotes => FileModel.all)
   end
   
   def new_quote
