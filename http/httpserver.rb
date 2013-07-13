@@ -6,8 +6,8 @@ require "logger"
 
 module Practice
   class HttpServer
-    DEFAULT_WEB_ROOT      = "./public"
-    DEFAULT_FILE          = "index.html"
+    DEFAULT_WEB_ROOT  = "./public"
+    DEFAULT_FILE      = "index.html"
 
     attr_accessor :web_root, :default_file
     
