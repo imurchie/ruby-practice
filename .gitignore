@@ -3,3 +3,4 @@ markov/settings.yml
 *.gem
 *.lock
 *.yml
+.ruby_version
